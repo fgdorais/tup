@@ -214,9 +214,8 @@ lemma take_append {xs : α ^ m} {ys : α ^ n} : take m (xs ++ ys) = xs :=
 tup.ext (λ i, by unfold tup.take; apply append_lift)
 
 @[reducible] 
-definition take_of_le {{m n : ℕ}} : n ≤ m → α ^ m → α ^ n :=
-assume h : n ≤ m, 
-eq.rec_on (nat.add_sub_of_le h) (take n)
+definition take_of_le {{m n : ℕ}} : n ≤ m → α ^ m → α ^ n
+| h xs i := xs[fin.lift_of_le h i]
 
 @[reducible] 
 definition drop (n : ℕ) (xs : α ^ (n + m)) : α ^ m :=
@@ -230,9 +229,8 @@ lemma drop_append {xs : α ^ m} {ys : α ^ n} : drop m (xs ++ ys) = ys :=
 tup.ext (λ i, by unfold tup.drop; apply append_push)
 
 @[reducible]
-definition drop_of_le {{m n : ℕ}} : m ≤ n → α ^ n → α ^ m :=
-assume h : m ≤ n,
-eq.rec_on (nat.sub_add_of_le h) (drop (n - m))
+definition drop_of_le {{m n : ℕ}} : m ≤ n → α ^ n → α ^ m
+| h xs i := xs[fin.push_of_le h i]
 
 end append
 
