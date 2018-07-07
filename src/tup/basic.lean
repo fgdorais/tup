@@ -12,7 +12,7 @@ instance type_has_pow : has_pow Type* ℕ := {pow := tup}
 namespace tup
 variable {α : Type*}
 
-@[inline] private
+@[reducible]
 definition ith {n : ℕ} (xs : α ^ n) (i : fin n) : α := xs i
 
 notation xs `[`:max_plus i `]`:0 := ith xs i
