@@ -137,6 +137,10 @@ tail (map f xs)
 ... = tail (f (head xs) :: map f (tail xs)) : by rw map_cons
 ... = map f (tail xs)                       : by rw tail_cons
 
+@[simp]
+lemma map_map (g : β → γ) (f : α → β) {n : ℕ} (xs : α ^ n) :
+map g (map f xs) = map (g ∘ f) xs := rfl
+
 @[simp] 
 lemma map₂_nil (f : α → β → γ) : map₂ f nil nil = nil := eq_nil _
 
