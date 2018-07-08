@@ -3,7 +3,7 @@ Copyright © 2018 François G. Dorais. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 
-import .basic .cons .extra
+import .basic .cons fin.extra
 
 variables {α : Type*} [dlo : decidable_linear_order α]
 include dlo
