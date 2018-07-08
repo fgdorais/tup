@@ -10,3 +10,4 @@ import .choice
 import .cons
 import .map
 import .minmax
+import .quotient
