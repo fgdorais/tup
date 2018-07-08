@@ -7,4 +7,5 @@ import .basic
 import .cons
 import .map
 import .append
+import .bar
 import .choice

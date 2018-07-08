@@ -26,6 +26,11 @@ definition zero (n : ℕ) : fin (n+1) := ⟨0, nat.succ_pos n⟩
 
 definition last (n : ℕ) : fin (n+1) := ⟨n, nat.lt_succ_self n⟩
 
+@[simp]
+lemma eq_rec_val : 
+∀ {m n : ℕ} {h : m = n} {i : fin m}, @fin.val n (eq.rec_on h i) = i.val
+| m .(m) rfl ⟨i,hi⟩ := rfl
+
 @[reducible]
 definition lift_by {m : ℕ} (n : ℕ) : fin m → fin (m+n)
 | ⟨i,h⟩ := ⟨i, nat.lt_add_right i m n h⟩
@@ -41,6 +46,11 @@ lemma lift_by_val {m n : ℕ} :
 ∀ {i : fin m}, (lift_by n i).val = i.val
 | ⟨_,_⟩ := rfl
 
+@[simp]
+lemma lift_of_le_val {m n : ℕ} {h : m ≤ n} :
+∀ {i : fin m}, (lift_of_le h i).val = i.val
+| ⟨i,ih⟩ := by simp
+
 @[reducible]
 definition push_by {m : ℕ} (n : ℕ) : fin m → fin (n+m)
 | ⟨i,h⟩ := ⟨n+i, nat.add_lt_add_left h n⟩
@@ -55,6 +65,11 @@ definition push_of_le {m n : ℕ} : m ≤ n → fin m → fin n
 lemma push_by_val {m n : ℕ} : 
 ∀ {i : fin m}, (push_by n i).val = n + i.val
 | ⟨_,_⟩ := rfl
+
+@[simp]
+lemma push_of_le_val {m n : ℕ} {h : m ≤ n} :
+∀ {i : fin m}, (push_of_le h i).val = (n - m) + i.val 
+| ⟨i,ih⟩ := by simp
 
 lemma lift_push_eq_push_lift {n : ℕ} : 
 ∀ {i : fin n}, lift (push i) = push (lift i)
