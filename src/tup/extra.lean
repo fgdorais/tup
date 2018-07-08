@@ -31,6 +31,10 @@ lemma eq_rec_val :
 ∀ {m n : ℕ} {h : m = n} {i : fin m}, @fin.val n (eq.rec_on h i) = i.val
 | m .(m) rfl ⟨i,hi⟩ := rfl
 
+lemma nonzero_of_fin : ∀ {n : ℕ}, fin n → n ≠ 0
+| 0 i := fin.elim0 i
+| (n+1) _ := nat.succ_ne_zero n
+
 @[reducible]
 definition lift_by {m : ℕ} (n : ℕ) : fin m → fin (m+n)
 | ⟨i,h⟩ := ⟨i, nat.lt_add_right i m n h⟩
