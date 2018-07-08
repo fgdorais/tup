@@ -1,3 +1,7 @@
+/-
+Copyright © 2018 François G. Dorais. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
 
 theorem fin.choice : Π {n : ℕ} {C : fin n → Sort*}, 
 (∀ i, nonempty (C i)) → nonempty (Π i, C i)
