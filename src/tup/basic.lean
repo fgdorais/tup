@@ -7,8 +7,13 @@ definition tup (α : Type*) (n : ℕ) := fin n → α
 
 instance type_has_pow : has_pow Type* ℕ := {pow := tup}
 
+definition ntup (α : Type*) := sigma (tup α)
+
 namespace tup
 variable {α : Type*}
+
+@[reducible]
+definition length {n : ℕ} (xs : α ^ n) : ℕ := n
 
 @[reducible]
 definition ith {n : ℕ} (xs : α ^ n) (i : fin n) : α := xs i
@@ -24,5 +29,20 @@ definition const {n : ℕ} (x : α) : α ^ n := λ _, x
 @[simp]
 lemma const_val {n : ℕ} {x : α} {i : fin n} : (const x)[i] = x := rfl
 
+@[reducible]
+definition to_ntup {n : ℕ} (xs : α ^ n) : ntup α := ⟨n, xs⟩ 
+
 end tup
 
+namespace ntup
+variable {α : Type*}
+
+@[reducible]
+definition length : ntup α → ℕ
+| ⟨n,_⟩ := n
+
+@[reducible]
+definition to_tup (α : Type*) : Π x : ntup α, α ^ (length x)
+| ⟨_,xs⟩ := xs
+
+end ntup
