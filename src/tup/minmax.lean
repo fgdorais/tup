@@ -1,10 +1,7 @@
-<<<<<<< HEAD
 /-
 Copyright © 2018 François G. Dorais. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-=======
->>>>>>> ad1aa1bb5931d1af50ad7662603e35d19a104732
 
 import .basic .cons .extra
 
