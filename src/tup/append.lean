@@ -74,3 +74,14 @@ definition drop_of_le {{m n : ℕ}} : m ≤ n → α ^ n → α ^ m
 | h xs i := xs[fin.push_of_le h i]
 
 end tup
+
+namespace ntup
+variable {α : Type*}
+
+@[reducible]
+definition append : ntup α → ntup α → ntup α
+| ⟨n, xs⟩ ⟨m, ys⟩ := ⟨n + m, xs ++ ys⟩ 
+
+instance : has_append (ntup α) := ⟨append⟩
+
+end ntup
