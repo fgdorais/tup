@@ -38,11 +38,14 @@ namespace ntup
 variable {α : Type*}
 
 @[reducible]
-definition length : ntup α → ℕ
-| ⟨n,_⟩ := n
+definition length : ntup α → ℕ := sigma.fst
 
 @[reducible]
-definition to_tup (α : Type*) : Π x : ntup α, α ^ (length x)
-| ⟨_,xs⟩ := xs
+definition to_tup : Π x : ntup α, α ^ (length x) := sigma.snd
+
+@[reducible] 
+definition ith : Π (nxs : ntup α) (i : fin (length nxs)), α
+| ⟨_,xs⟩ i := tup.ith xs i
 
 end ntup
+
