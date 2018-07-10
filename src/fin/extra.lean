@@ -31,53 +31,65 @@ lemma eq_rec_val :
 ∀ {m n : ℕ} {h : m = n} {i : fin m}, @fin.val n (eq.rec_on h i) = i.val
 | m .(m) rfl ⟨i,hi⟩ := rfl
 
+@[reducible] 
+definition cast {m n : ℕ} : m = n → fin m → fin n := eq.rec_on
+
+lemma cast_val {m n : ℕ} {h : m = n} (i : fin m) : (cast h i).val = i.val := by simp
+
 lemma nonzero_of_fin : ∀ {n : ℕ}, fin n → n ≠ 0
 | 0 i := fin.elim0 i
 | (n+1) _ := nat.succ_ne_zero n
 
 @[reducible]
-definition lift_by {m : ℕ} (n : ℕ) : fin m → fin (m+n)
+definition lift {m : ℕ} (n : ℕ := 1) : fin m → fin (m+n)
 | ⟨i,h⟩ := ⟨i, nat.lt_add_right i m n h⟩
 
-definition lift {n : ℕ} : fin n → fin (n+1) := lift_by 1
-
 @[reducible]
-definition lift_of_le {m n : ℕ} : m ≤ n → fin m → fin n
-| h i := eq.rec_on (nat.add_sub_of_le h) (lift_by (n-m) i)
+definition lift_to {m n : ℕ} : m ≤ n → fin m → fin n
+| h i := eq.rec_on (nat.add_sub_of_le h) (lift (n-m) i)
 
 @[simp]
-lemma lift_by_val {m n : ℕ} : 
-∀ {i : fin m}, (lift_by n i).val = i.val
+lemma lift_val {m n : ℕ} : 
+∀ {i : fin m}, (lift n i).val = i.val
 | ⟨_,_⟩ := rfl
 
 @[simp]
-lemma lift_of_le_val {m n : ℕ} {h : m ≤ n} :
-∀ {i : fin m}, (lift_of_le h i).val = i.val
+lemma lift_to_val {m n : ℕ} {h : m ≤ n} :
+∀ {i : fin m}, (lift_to h i).val = i.val
 | ⟨i,ih⟩ := by simp
 
 @[reducible]
-definition push_by {m : ℕ} (n : ℕ) : fin m → fin (n+m)
-| ⟨i,h⟩ := ⟨n+i, nat.add_lt_add_left h n⟩
-
-definition push {n : ℕ} : fin n → fin (1+n) := push_by 1
+definition push {n : ℕ} (m : ℕ := 1) : fin n → fin (m+n)
+| ⟨i,h⟩ := ⟨m+i, nat.add_lt_add_left h m⟩
 
 @[reducible]
-definition push_of_le {m n : ℕ} : m ≤ n → fin m → fin n
-| h i := eq.rec_on (nat.sub_add_of_le h) (push_by (n-m) i)
+definition push_to {m n : ℕ} : m ≤ n → fin m → fin n
+| h i := eq.rec_on (nat.sub_add_of_le h) (push (n-m) i)
 
 @[simp]
-lemma push_by_val {m n : ℕ} : 
-∀ {i : fin m}, (push_by n i).val = n + i.val
+lemma push_val {m n : ℕ} : 
+∀ {i : fin m}, (push n i).val = n + i.val
 | ⟨_,_⟩ := rfl
 
 @[simp]
-lemma push_of_le_val {m n : ℕ} {h : m ≤ n} :
-∀ {i : fin m}, (push_of_le h i).val = (n - m) + i.val 
+lemma push_to_val {m n : ℕ} {h : m ≤ n} :
+∀ {i : fin m}, (push_to h i).val = (n - m) + i.val 
 | ⟨i,ih⟩ := by simp
 
-lemma lift_push_eq_push_lift {n : ℕ} : 
-∀ {i : fin n}, lift (push i) = push (lift i)
-| ⟨_,_⟩ := rfl
+lemma lift_push_veq_push_lift {l m n : ℕ} : 
+∀ {i : fin l}, (lift m (push n i)).val = (push n (lift m i)).val :=
+λ ⟨i,_⟩, by simp
+
+@[simp]
+lemma lift_lift {l m n : ℕ} {hlm : l ≤ m} {hmn : m ≤ n} : 
+∀ {i : fin l}, lift_to hmn (lift_to hlm i) = lift_to (le_trans hlm hmn) i :=
+λ i, eq_of_veq (by simp)
+
+@[simp]
+lemma push_push {l m n : ℕ} {hlm : l ≤ m} {hmn : m ≤ n} : 
+∀ {i : fin l}, push_to hmn (push_to hlm i) = push_to (le_trans hlm hmn) i :=
+have m - l ≤ m, from nat.sub_le m l,
+λ i, eq_of_veq $ by simp; rw [add_comm (m-l) (n-m), ←nat.add_sub_assoc hlm (n-m), nat.sub_add_of_le hmn]
 
 end fin
 

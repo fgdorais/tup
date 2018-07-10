@@ -3,6 +3,8 @@ Copyright © 2018 François G. Dorais. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 
+import fin
+
 definition tup (α : Type*) (n : ℕ) := fin n → α
 
 instance type_has_pow : has_pow Type* ℕ := {pow := tup}
@@ -23,6 +25,16 @@ notation xs `[`:max_plus i `]`:0 := ith xs i
 lemma ext {n : ℕ} {xs ys : α ^ n} : 
 (∀ i, xs[i] = ys[i]) → xs = ys := funext
 
+@[reducible]
+definition cast {m n : ℕ} (h : m = n) : α ^ m → α ^ n :=
+λ xs i, xs[fin.cast (eq.symm h) i]
+
+definition nil : α ^ 0 := fin.elim0
+
+@[simp] 
+lemma eq_nil (xs : α ^ 0) : xs = nil :=
+funext (λ i, fin.elim0 i)
+
 @[reducible] 
 definition const {n : ℕ} (x : α) : α ^ n := λ _, x
 
@@ -36,6 +48,8 @@ end tup
 
 namespace ntup
 variable {α : Type*}
+
+definition nil : ntup α := ⟨0, tup.nil⟩
 
 @[reducible]
 definition length : ntup α → ℕ := sigma.fst
