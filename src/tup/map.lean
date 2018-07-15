@@ -19,6 +19,30 @@ definition map₂ : (α → β → γ) → α ^ n → β ^ n → γ ^n :=
 @[simp] 
 lemma map_nil (f : α → β) : map f nil = nil := eq_nil _
 
+@[simp]
+lemma map1 (f : α → β) (x : α) : map f ⟪x⟫ = ⟪f x⟫ := 
+tup.ext $ λ i, match i with
+| ⟨0,_⟩ := rfl
+| ⟨k+1,hk⟩ := absurd (nat.le_add_left 1 k) (not_le_of_gt hk)
+end
+
+@[simp]
+lemma map2 (f : α → β) (x y : α) : map f ⟪x, y⟫ = ⟪f x, f y⟫ := 
+tup.ext $ λ i, match i with
+| ⟨0,_⟩ := rfl
+| ⟨1,_⟩ := rfl
+| ⟨k+2,hk⟩ := absurd (nat.le_add_left 2 k) (not_le_of_gt hk)
+end
+
+@[simp]
+lemma map3 (f : α → β) (x y z : α) : map f ⟪x, y, z⟫ = ⟪f x, f y, f z⟫ := 
+tup.ext $ λ i, match i with
+| ⟨0,_⟩ := rfl
+| ⟨1,_⟩ := rfl
+| ⟨2,_⟩ := rfl
+| ⟨k+3,hk⟩ := absurd (nat.le_add_left 3 k) (not_le_of_gt hk)
+end
+
 lemma map_cons (f : α → β) (x : α) (xs : α ^ n) : 
 map f (x :: xs) = f x :: map f xs := 
 ext (λ i, match i with
