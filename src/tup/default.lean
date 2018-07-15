@@ -7,7 +7,10 @@ import .basic
 import .append
 import .bar
 import .choice
+import .conj
 import .cons
+import .decidable
 import .map
 import .minmax
 import .quotient
+import .sumprod
