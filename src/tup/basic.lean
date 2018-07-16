@@ -29,6 +29,7 @@ lemma ext {n : ℕ} {xs ys : α ^ n} :
 definition cast {m n : ℕ} (h : m = n) : α ^ m → α ^ n :=
 λ xs i, xs[fin.cast (eq.symm h) i]
 
+@[irreducible]
 definition nil : α ^ 0 := fin.elim0
 
 lemma eq_nil (xs : α ^ 0) : xs = nil :=

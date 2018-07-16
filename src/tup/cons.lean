@@ -3,7 +3,7 @@ Copyright © 2018 François G. Dorais. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 
-import .basic fin.extra
+import .basic
 
 namespace tup
 variables {α : Type*} {n : ℕ}
@@ -15,11 +15,11 @@ definition cons : α → α ^ n → α ^ (n + 1)
 notation x :: xs := cons x xs
 
 @[simp] 
-lemma cons_zero {x : α} {xs : α ^ n} : 
+lemma cons_val_zero {x : α} {xs : α ^ n} : 
 (x :: xs)[0] = x := rfl
 
 @[simp] 
-lemma cons_succ {x : α} {xs : α ^ n} : 
+lemma cons_val_succ {x : α} {xs : α ^ n} : 
 ∀ {i : fin n}, (x :: xs)[fin.succ i] = xs[i] := λ ⟨_, _⟩, rfl
 
 @[reducible] 
@@ -48,6 +48,7 @@ match n, h with
 | (n+1), _ := tail
 end
 
+@[simp]
 lemma cons_head_tail (xs : α ^ (n+1)) :
 head xs :: tail xs = xs := 
 ext (λ i, match i with
@@ -57,7 +58,7 @@ end)
 
 end tup
 
-notation `⟪` l:(foldr `, `  (h t, tup.cons h t) tup.nil `⟫`) := l
+notation `⟪` l:(foldr `, ` (h t, tup.cons h t) tup.nil `⟫`) := l
 
 section rec
 universe u
