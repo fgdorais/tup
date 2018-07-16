@@ -48,7 +48,6 @@ match n, h with
 | (n+1), _ := tail
 end
 
-@[simp] 
 lemma cons_head_tail (xs : α ^ (n+1)) :
 head xs :: tail xs = xs := 
 ext (λ i, match i with
