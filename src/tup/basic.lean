@@ -31,7 +31,6 @@ definition cast {m n : ℕ} (h : m = n) : α ^ m → α ^ n :=
 
 definition nil : α ^ 0 := fin.elim0
 
-@[simp] 
 lemma eq_nil (xs : α ^ 0) : xs = nil :=
 funext (λ i, fin.elim0 i)
 
