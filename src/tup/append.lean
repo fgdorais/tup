@@ -82,6 +82,15 @@ tup.ext (λ i, by simp)
 definition drop_of_le {{m n : ℕ}} : m ≤ n → α ^ n → α ^ m
 | h xs i := xs[fin.push_to h i]
 
+lemma drop_of_le_val {m n : ℕ} (h : m ≤ n) {xs : α ^ n} :
+∀ (i : fin m), (drop_of_le h xs)[i] = xs[fin.push_to h i] := 
+λ _, rfl
+
+@[simp]
+lemma drop_drop {l m n : ℕ} {hlm : l ≤ m} {hmn : m ≤ n} {xs : α ^ n} :
+drop_of_le hlm (drop_of_le hmn xs) = drop_of_le (le_trans hlm hmn) xs :=
+tup.ext $ λ i, by rw [drop_of_le_val hlm, drop_of_le_val hmn, fin.push_push]
+
 end tup
 
 namespace ntup
