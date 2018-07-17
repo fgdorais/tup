@@ -57,6 +57,15 @@ tup.ext (λ i, by simp)
 definition take_of_le {{m n : ℕ}} : n ≤ m → α ^ m → α ^ n
 | h xs i := xs[fin.lift_to h i]
 
+lemma take_of_le_val {m n : ℕ} (h : m ≤ n) {xs : α ^ n} :
+∀ (i : fin m), (take_of_le h xs)[i] = xs[fin.lift_to h i] := 
+λ _, rfl
+
+@[simp]
+lemma take_take {l m n : ℕ} {hlm : l ≤ m} {hmn : m ≤ n} {xs : α ^ n} :
+take_of_le hlm (take_of_le hmn xs) = take_of_le (le_trans hlm hmn) xs :=
+tup.ext $ λ i, by rw [take_of_le_val hlm, take_of_le_val hmn, fin.lift_lift]
+
 @[reducible] 
 definition drop (n : ℕ) (xs : α ^ (n + m)) : α ^ m :=
 λ i : fin m, xs[fin.push n i]
