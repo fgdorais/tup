@@ -29,6 +29,11 @@ lemma ext {n : ℕ} {xs ys : α ^ n} :
 definition cast {m n : ℕ} (h : m = n) : α ^ m → α ^ n :=
 λ xs i, xs[fin.cast (eq.symm h) i]
 
+lemma eq_rec_on_eq_cast : 
+Π {m n : ℕ} (h : m = n) (xs : α ^ m), 
+@eq.rec_on _ _ _ _ h xs = cast h xs
+| m .(m) rfl xs := rfl
+
 @[irreducible]
 definition nil : α ^ 0 := fin.elim0
 
@@ -49,8 +54,6 @@ end tup
 namespace ntup
 variable {α : Type*}
 
-definition nil : ntup α := ⟨0, tup.nil⟩
-
 @[reducible]
 definition length : ntup α → ℕ := sigma.fst
 
@@ -60,6 +63,17 @@ definition to_tup : Π x : ntup α, α ^ (length x) := sigma.snd
 @[reducible] 
 definition ith : Π (nxs : ntup α) (i : fin (length nxs)), α
 | ⟨_,xs⟩ i := tup.ith xs i
+
+definition nil : ntup α := ⟨0, tup.nil⟩
+
+lemma eq {{nxs nys : ntup α}} (h : nxs.length = nys.length) : tup.cast h nxs.to_tup = nys.to_tup → nxs = nys :=
+assume hc,
+have @eq.rec_on _ _ _ _ h nxs.to_tup = nys.to_tup,
+from eq.trans (tup.eq_rec_on_eq_cast h nxs.to_tup) hc,
+sigma.eq h this
+
+lemma eq_nil {{nxs : ntup α}} : nxs.length = 0 → nxs = nil :=
+assume h, eq h (tup.ext $ λ i, fin.elim0 i)
 
 end ntup
 
