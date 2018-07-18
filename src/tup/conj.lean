@@ -28,7 +28,7 @@ conj_val_of_ge (le_refl n)
 
 @[simp] 
 lemma conj_lift {x : α} {xs : α ^ n} : 
-∀ {i : fin n}, (conj xs x)[fin.lift 1 i] = xs[i] := 
+∀ {i : fin n}, (conj xs x)[fin.lift_by 1 i] = xs[i] := 
 λ ⟨i, ih⟩, conj_val_of_lt ih
 
 @[reducible] 
@@ -37,7 +37,7 @@ definition last : α ^ (n+1) → α :=
 
 @[reducible] 
 definition left : α ^ (n+1) → α ^ n := 
-λ xs i, xs[fin.lift 1 i]
+λ xs i, xs[fin.lift_by 1 i]
 
 definition last_of_nonzero (h : n ≠ 0) : α ^ n → α :=
 match n, h with 

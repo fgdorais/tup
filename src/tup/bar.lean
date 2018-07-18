@@ -18,7 +18,7 @@ lemma bar_val (f : ℕ → α) {n : ℕ} :
 | ⟨_,_⟩ := rfl
 
 lemma take_bar (f : ℕ → α) {m n : ℕ} (h : m ≤ n) :
-take_of_le h (bar f n) = bar f m :=
+take h (bar f n) = bar f m :=
 tup.ext (λ _, by simp)
 
 definition extend {n : ℕ} (xs : α ^ n) (x : α) (i : ℕ) : α :=
