@@ -18,6 +18,14 @@ show m + (i - m) < m + n,
 from calc m + (i - m) = i : add_sub_of_le hm
               ... < m + n : h
 
+lemma le_sub_of_add_le_of_ge {m n i : ℕ} :
+n ≤ i → n + m ≤ i → m ≤ i - n :=
+assume hn h, 
+le_of_add_le_add_left $
+show n + m ≤ n + (i - n),
+from calc n + m ≤ i : h
+  ... = n + (i - n) : eq.symm $ add_sub_of_le hn
+
 end nat
 
 namespace fin

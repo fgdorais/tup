@@ -29,6 +29,13 @@ lemma ext {n : ℕ} {xs ys : α ^ n} :
 definition cast {m n : ℕ} (h : m = n) : α ^ m → α ^ n :=
 λ xs i, xs[fin.cast (eq.symm h) i]
 
+@[simp]
+lemma cast_val {m n : ℕ} (h : m = n) (xs : α ^ m) (i : fin n) :
+(tup.cast h xs)[i] = xs[fin.cast (eq.symm h) i] := rfl
+
+@[simp]
+lemma cast_rfl {n : ℕ} (xs : α ^ n) : cast rfl xs = xs := rfl
+
 lemma eq_rec_on_eq_cast : 
 Π {m n : ℕ} (h : m = n) (xs : α ^ m), 
 @eq.rec_on _ _ _ _ h xs = cast h xs
@@ -60,11 +67,20 @@ definition length : ntup α → ℕ := sigma.fst
 @[reducible]
 definition to_tup : Π x : ntup α, α ^ (length x) := sigma.snd
 
+@[simp]
+lemma to_tup_mk {n : ℕ} (xs : α ^ n) : to_tup ⟨n,xs⟩ = xs := rfl
+
 @[reducible] 
 definition ith : Π (nxs : ntup α) (i : fin (length nxs)), α
 | ⟨_,xs⟩ i := tup.ith xs i
 
 definition nil : ntup α := ⟨0, tup.nil⟩
+
+@[simp]
+lemma nil_length : (@nil α).length = 0 := rfl
+
+@[simp]
+lemma nil_to_tup : (@nil α).to_tup = tup.nil := rfl
 
 lemma eq {{nxs nys : ntup α}} (h : nxs.length = nys.length) : tup.cast h nxs.to_tup = nys.to_tup → nxs = nys :=
 assume hc,
