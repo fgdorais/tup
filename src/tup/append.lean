@@ -24,13 +24,13 @@ lemma ith_append_of_ge {xs : α ^ m} {ys : α ^ n} {i : ℕ} (h : i < m+n) (hm :
 (xs ⊔ ys)[⟨i, h⟩] = ys[⟨i-m, nat.sub_lt_of_lt_add_of_ge hm h⟩] := dif_neg (not_lt_of_ge hm)
 
 @[simp]
-lemma append_lift {xs : α ^ m} {ys : α ^ n} :
-∀ i, (xs ⊔ ys)[fin.lift n i] = xs[i]
+lemma append_lift_by {xs : α ^ m} {ys : α ^ n} :
+∀ i, (xs ⊔ ys)[fin.lift_by n i] = xs[i]
 | ⟨i, h⟩ := ith_append_of_lt h
 
 @[simp]
-lemma append_push {xs : α ^ m} {ys : α ^ n} :
-∀ i : fin n, (xs ⊔ ys)[fin.push m i] = ys[i]
+lemma append_push_by {xs : α ^ m} {ys : α ^ n} :
+∀ i : fin n, (xs ⊔ ys)[fin.push_by m i] = ys[i]
 | ⟨i, h⟩ := 
   calc
   (xs ⊔ ys)[⟨m+i, nat.add_lt_add_left h m⟩] 
@@ -42,54 +42,72 @@ lemma append_nil (xs : α ^ n) : xs ⊔ nil = xs :=
 ext (λ ⟨i,hi⟩, ith_append_of_lt hi)
 
 @[reducible] 
-definition take (n : ℕ) (xs : α ^ (n + m)) : α ^ n 
-:= λ i, xs[fin.lift _ i]
+definition take {{m n : ℕ}} : n ≤ m → α ^ m → α ^ n
+| h xs i := xs[fin.lift h i]
 
 @[simp]
-lemma take_val {xs : α ^ (n + m)} :
-∀ i : fin n, (take n xs)[i] = xs[fin.lift m i]
-| ⟨i, hi⟩ := rfl
-
-lemma take_append {xs : α ^ m} {ys : α ^ n} : take m (xs ⊔ ys) = xs :=
-tup.ext (λ i, by simp)
-
-@[reducible] 
-definition take_of_le {{m n : ℕ}} : n ≤ m → α ^ m → α ^ n
-| h xs i := xs[fin.lift_to h i]
-
-lemma take_of_le_val {m n : ℕ} (h : m ≤ n) {xs : α ^ n} :
-∀ (i : fin m), (take_of_le h xs)[i] = xs[fin.lift_to h i] := 
+lemma take_val {m n : ℕ} (h : m ≤ n) {xs : α ^ n} :
+∀ (i : fin m), (take h xs)[i] = xs[fin.lift h i] := 
 λ _, rfl
 
 @[simp]
 lemma take_take {l m n : ℕ} {hlm : l ≤ m} {hmn : m ≤ n} {xs : α ^ n} :
-take_of_le hlm (take_of_le hmn xs) = take_of_le (le_trans hlm hmn) xs :=
-tup.ext $ λ i, by rw [take_of_le_val hlm, take_of_le_val hmn, fin.lift_lift]
-
-@[reducible] 
-definition drop (n : ℕ) (xs : α ^ (n + m)) : α ^ m :=
-λ i : fin m, xs[fin.push n i]
+take hlm (take hmn xs) = take (le_trans hlm hmn) xs :=
+tup.ext $ λ i, by simp
 
 @[simp]
-lemma drop_val {xs : α ^ (m + n)} :
-∀ i : fin n, (drop m xs)[i] = xs[fin.push m i]
-| ⟨i, hi⟩ := rfl
-
-lemma drop_append {xs : α ^ m} {ys : α ^ n} : drop m (xs ⊔ ys) = ys :=
-tup.ext (λ i, by simp)
+lemma take_append {m n : ℕ} {xs : α ^ m} {ys : α ^ n} :
+take (nat.le_add_right m n) (xs ⊔ ys) = xs :=
+tup.ext $ λ ⟨i,hi⟩, by simp [ith_append_of_lt hi]
 
 @[reducible]
-definition drop_of_le {{m n : ℕ}} : m ≤ n → α ^ n → α ^ m
-| h xs i := xs[fin.push_to h i]
+definition drop {{m n : ℕ}} : m ≤ n → α ^ n → α ^ m
+| h xs i := xs[fin.push h i]
 
-lemma drop_of_le_val {m n : ℕ} (h : m ≤ n) {xs : α ^ n} :
-∀ (i : fin m), (drop_of_le h xs)[i] = xs[fin.push_to h i] := 
+@[simp]
+lemma drop_val {m n : ℕ} (h : m ≤ n) {xs : α ^ n} :
+∀ (i : fin m), (drop h xs)[i] = xs[fin.push h i] := 
 λ _, rfl
 
 @[simp]
 lemma drop_drop {l m n : ℕ} {hlm : l ≤ m} {hmn : m ≤ n} {xs : α ^ n} :
-drop_of_le hlm (drop_of_le hmn xs) = drop_of_le (le_trans hlm hmn) xs :=
-tup.ext $ λ i, by rw [drop_of_le_val hlm, drop_of_le_val hmn, fin.push_push]
+drop hlm (drop hmn xs) = drop (le_trans hlm hmn) xs :=
+tup.ext $ λ i, by simp
+
+@[simp]
+lemma drop_append {m n : ℕ} {xs : α ^ m} {ys : α ^ n} :
+drop (nat.le_add_left n m) (xs ⊔ ys) = ys :=
+tup.ext $ λ ⟨i,hi⟩,
+have hlt : ((m + n) - n) + i < m + n,
+from calc
+((m + n) - n) + i 
+    = m + i : by rw nat.add_sub_cancel
+... < m + n : nat.add_lt_add_left hi m,
+have hge : ((m + n) - n) + i ≥ m, 
+from calc
+((m + n) - n) + i 
+    = m + i : by rw nat.add_sub_cancel
+... ≥ m : nat.le_add_right m i,
+have heq : (i + ((m + n) - n)) - m = i,
+from calc
+(i + ((m + n) - n)) - m 
+    = (i + m) - m : by rw nat.add_sub_cancel
+... = i : by rw nat.add_sub_cancel,
+by simp [heq, ith_append_of_ge hlt hge]
+
+@[simp]
+lemma append_take_drop {m n : ℕ} {xs : α ^ (m + n)} :
+(take (nat.le_add_right m n) xs) ⊔ (drop (nat.le_add_left n m) xs) = xs :=
+tup.ext $ λ ⟨i, hi⟩,
+if h : i < m then
+  by simp [ith_append_of_lt h]
+else
+  have i - m + (m + n - n) = i,
+  from calc
+  (i - m) + (m + n - n)
+      = (i - m) + m : by rw nat.add_sub_cancel
+  ... = i : by rw nat.sub_add_cancel (le_of_not_gt h),
+  by simp [ith_append_of_ge hi (le_of_not_gt h), fin.push, this]
 
 end tup
 
