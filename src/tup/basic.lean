@@ -36,6 +36,22 @@ lemma cast_val {m n : ℕ} (h : m = n) (xs : α ^ m) (i : fin n) :
 @[simp]
 lemma cast_rfl {n : ℕ} (xs : α ^ n) : cast rfl xs = xs := rfl
 
+@[simp]
+lemma cast_trans :
+∀ {l m n : ℕ} (xs : α ^ l) (hlm : l = m) (hmn : m = n),
+cast hmn (cast hlm xs) = cast (eq.trans hlm hmn) xs
+| n .(n) .(n) xs rfl rfl := rfl
+
+lemma eq_cast_symm_of_cast_eq :
+∀ {m n : ℕ} {xs : α ^ m} {ys : α ^ n} {h : m = n},
+cast h xs = ys → xs = cast (eq.symm h) ys
+| n .(n) xs ys rfl := id
+
+lemma cast_symm_eq_of_eq_cast :
+∀ {m n : ℕ} {xs : α ^ m} {ys : α ^ n} {h : n = m},
+xs = cast h ys → cast (eq.symm h) xs = ys
+| n .(n) xs ys rfl := id
+
 lemma eq_rec_on_eq_cast : 
 Π {m n : ℕ} (h : m = n) (xs : α ^ m), 
 @eq.rec_on _ _ _ _ h xs = cast h xs

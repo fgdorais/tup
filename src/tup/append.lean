@@ -23,7 +23,6 @@ lemma ith_append_of_lt {xs : α ^ m} {ys : α ^ n} {i : ℕ} (h : i < m) :
 lemma ith_append_of_ge {xs : α ^ m} {ys : α ^ n} {i : ℕ} (h : i < m+n) (hm : i ≥ m) :
 (xs ⊔ ys)[⟨i, h⟩] = ys[⟨i-m, nat.sub_lt_of_lt_add_of_ge hm h⟩] := dif_neg (not_lt_of_ge hm)
 
-
 @[simp]
 lemma append_lift_by {xs : α ^ m} {ys : α ^ n} :
 ∀ i, (xs ⊔ ys)[fin.lift_by n i] = xs[i]
@@ -41,10 +40,13 @@ lemma append_push_by {xs : α ^ m} {ys : α ^ n} :
 lemma append_nil (xs : α ^ n) : xs ⊔ nil = xs :=
 ext (λ ⟨i,hi⟩, ith_append_of_lt hi)
 
-lemma nil_append (xs : α ^ n) : tup.cast (nat.zero_add n) (nil ⊔ xs) = xs :=
+lemma nil_append' (xs : α ^ n) : tup.cast (nat.zero_add n) (nil ⊔ xs) = xs :=
 have ∀ (i : fin n), fin.cast (eq.symm (nat.zero_add n)) i = fin.push_by 0 i, 
 from λ ⟨i, hi⟩, fin.eq_of_veq $ by simp,
 ext $ λ i, by simp [this]
+
+lemma nil_append (xs : α ^ n) : nil ⊔ xs = tup.cast (eq.symm $ nat.zero_add n) xs :=
+eq_cast_symm_of_cast_eq $ nil_append' xs
 
 lemma append_assoc (xs : α ^ l) (ys : α ^ m) (zs : α ^ n) :
 cast (nat.add_assoc l m n) ((xs ⊔ ys) ⊔ zs) = xs ⊔ (ys ⊔ zs) :=
@@ -167,7 +169,7 @@ lemma append_nil :
 lemma nil_append :
 ∀ (nxs : ntup α), nil ++ nxs = nxs
 | ⟨nx,xs⟩ :=
-  ntup.eq (zero_add nx) (tup.nil_append xs)
+  ntup.eq (zero_add nx) (tup.nil_append' xs)
 
 @[simp]
 lemma append_assoc : 
