@@ -30,24 +30,13 @@ end nat
 
 namespace fin
 
-definition zero (n : ℕ) : fin (n+1) := ⟨0, nat.succ_pos n⟩
-
-definition last (n : ℕ) : fin (n+1) := ⟨n, nat.lt_succ_self n⟩
-
-@[simp]
-lemma eq_rec_val : 
-∀ {m n : ℕ} {h : m = n} {i : fin m}, @fin.val n (eq.rec_on h i) = i.val
-| m .(m) rfl ⟨i,hi⟩ := rfl
-
-@[reducible] 
-definition cast {m n : ℕ} : m = n → fin m → fin n := eq.rec_on
-
-@[simp]
-lemma cast_val {m n : ℕ} {h : m = n} (i : fin m) : (cast h i).val = i.val := by simp
-
 lemma nonzero_of_fin : ∀ {n : ℕ}, fin n → n ≠ 0
 | 0 i := fin.elim0 i
 | (n+1) _ := nat.succ_ne_zero n
+
+definition zero (n : ℕ) : fin (n+1) := ⟨0, nat.succ_pos n⟩
+
+definition last (n : ℕ) : fin (n+1) := ⟨n, nat.lt_succ_self n⟩
 
 @[reducible]
 definition lift_by {m : ℕ} (n : ℕ) : fin m → fin (m+n)
@@ -72,7 +61,7 @@ lemma lift_lift {l m n : ℕ} {hlm : l ≤ m} {hmn : m ≤ n} :
 λ i, eq_of_veq (by simp)
 
 @[reducible]
-definition push_by {n : ℕ} (m : ℕ := 1) : fin n → fin (m+n)
+definition push_by {n : ℕ} (m : ℕ) : fin n → fin (m+n)
 | ⟨i,h⟩ := ⟨m+i, nat.add_lt_add_left h m⟩
 
 @[simp]
