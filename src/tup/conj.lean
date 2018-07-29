@@ -13,30 +13,36 @@ definition conj : α ^ n → α → α ^ (n + 1) :=
 
 notation xs && x := conj xs x
 
+lemma ith_conj_of_lt {x : α} {xs : α ^ n} {i : ℕ} {hi : i < n + 1} (h : i < n) :
+(conj xs x)[⟨i, hi⟩] = xs[⟨i,h⟩] := dif_pos h
+
+lemma ith_conj_of_ge {x : α} {xs : α ^ n} {i : ℕ} (hi : i < n+1) (h : i ≥ n) :
+(conj xs x)[⟨i, hi⟩] = x := dif_neg (not_lt_of_ge h)
+
+lemma ith_conj_last {x : α} {xs : α ^ n} :
+(conj xs x)[⟨n, nat.lt_succ_self n⟩] = x := 
+ith_conj_of_ge _ (le_refl n)
+
 lemma conj_val_of_lt {x : α} {xs : α ^ n} :
 ∀ {i : fin (n+1)} (h : i.val < n), (conj xs x)[i] = xs[⟨i.val,h⟩]
-| ⟨i,hi⟩ h := dif_pos h
+| ⟨i,hi⟩ h := by simp [ith_conj_of_lt h]
 
 lemma conj_val_of_ge {x : α} {xs : α ^ n} :
 ∀ {i : fin (n+1)} (h : i.val ≥ n), (conj xs x)[i] = x
-| ⟨i,hi⟩ h := dif_neg (not_lt_of_ge h)
+| ⟨i,hi⟩ h := by simp [ith_conj_of_ge hi h]
 
-@[simp] 
-lemma conj_last {x : α} {xs : α ^ n} : 
+@[simp] lemma conj_last {x : α} {xs : α ^ n} : 
 (conj xs x)[fin.last n] = x := 
 conj_val_of_ge (le_refl n)
 
-@[simp] 
-lemma conj_lift {x : α} {xs : α ^ n} : 
+@[simp] lemma conj_lift {x : α} {xs : α ^ n} : 
 ∀ {i : fin n}, (conj xs x)[fin.lift_by 1 i] = xs[i] := 
 λ ⟨i, ih⟩, conj_val_of_lt ih
 
-@[reducible] 
-definition last : α ^ (n+1) → α := 
-λ xs, xs[fin.last n]
+@[reducible] definition last : α ^ (n+1) → α := 
+λ xs, xs[⟨n, nat.lt_succ_self n⟩]
 
-@[reducible] 
-definition left : α ^ (n+1) → α ^ n := 
+@[reducible] definition left : α ^ (n+1) → α ^ n := 
 λ xs i, xs[fin.lift_by 1 i]
 
 definition last_of_nonzero (h : n ≠ 0) : α ^ n → α :=
@@ -51,25 +57,20 @@ match n, h with
 | (n+1), _ := left
 end
 
-@[simp] 
-lemma last_conj {x : α} {xs : α ^ n} : 
-last (xs && x) = x := 
-conj_last
+@[simp] lemma last_conj {x : α} {xs : α ^ n} : 
+last (conj xs x) = x := conj_last
 
-@[simp] 
-lemma left_conj {x : α} {xs : α ^ n} : 
-left (xs && x) = xs := 
-ext (λ _, conj_lift)
+@[simp] lemma left_conj {x : α} {xs : α ^ n} : 
+left (conj xs x) = xs := ext $ λ _, conj_lift
 
 lemma conj_left_last (xs : α ^ (n + 1)) :
-left xs && last xs = xs :=
+conj (left xs) (last xs) = xs :=
 ext $ λ ⟨i,hi⟩,
-if h : i < n then
-  conj_val_of_lt h
+if h : i = n then
+  by simp [h, ith_conj_last]
 else
-  have fin.last n = ⟨i,hi⟩, 
-  from fin.eq_of_veq (le_antisymm (le_of_not_gt h) (nat.le_of_lt_succ hi)),
-  by rw [← this, conj_last]
+  have h : i < n, from nat.lt_of_le_and_ne (nat.le_of_lt_succ hi) h,
+  by simp [ith_conj_of_lt h]
 
 end tup
 

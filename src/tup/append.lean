@@ -3,7 +3,7 @@ Copyright © 2018 François G. Dorais. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 
-import .basic .cons fin.extra
+import .basic .cons .conj
 
 namespace tup
 variables {α : Type*} {l m n : ℕ}
@@ -37,36 +37,109 @@ lemma append_push_by {xs : α ^ m} {ys : α ^ n} :
       = ys[⟨(m+i)-m, _⟩] : ith_append_of_ge (nat.add_lt_add_left h m) (nat.le_add_right m i)
   ... = ys[⟨i, h⟩]       : by simp [nat.add_sub_cancel']
 
+definition fun_append (f : α → Sort*) {xs : α ^ m} {ys : α ^ n} :
+(Π i, f xs[i]) → (Π i, f ys[i]) → (Π i, f (xs ⊔ ys)[i]) :=
+λ fx fy ⟨i, hi⟩,
+if him : i < m then
+  by simp [ith_append_of_lt him]; apply fx
+else
+  have him : i ≥ m, from le_of_not_gt him,
+  by simp [ith_append_of_ge hi him]; apply fy
+
+lemma prop_append (p : α → Prop) {xs : α ^ m} {ys : α ^ n} :
+(∀ i, p xs[i]) → (∀ i, p ys[i]) → (∀ i, p (xs ⊔ ys)[i]) := fun_append p
+
 lemma append_nil (xs : α ^ n) : xs ⊔ nil = xs :=
-ext (λ ⟨i,hi⟩, ith_append_of_lt hi)
+ext $ λ ⟨i,hi⟩, ith_append_of_lt hi
+
+lemma append_conj (xs : α ^ m) (ys : α ^ n) (y : α) :
+xs ⊔ (conj ys y) = tup.cast (add_assoc m n 1) (conj (xs ⊔ ys) y) :=
+ext $ λ ⟨i,hi⟩,
+have hi' : i < m + n + 1, by rw [add_assoc]; exact hi,
+if him : i < m then
+  have i < m + n, from nat.lt_add_right i m n him,
+  by simp 
+  [ ith_append_of_lt him
+  , ith_conj_of_lt this
+  ]
+else if himn : i < m + n then
+  have him : i ≥ m, from le_of_not_gt him,
+  have i - m < n, from nat.sub_lt_of_lt_add_of_ge him himn,
+  by simp
+  [ ith_append_of_ge hi him
+  , ith_conj_of_lt this
+  , ith_conj_of_lt himn
+  , ith_append_of_ge himn him
+  ]
+else
+  have him : i ≥ m, from le_of_not_gt him,
+  have himn : i ≥ m + n, from le_of_not_gt himn,
+  have i - m ≥ n, from nat.le_sub_of_add_le_of_ge him himn,
+  by simp
+  [ ith_conj_of_ge _ himn
+  , ith_append_of_ge _ him
+  , ith_conj_of_ge _ this
+  ]
 
 lemma nil_append' (xs : α ^ n) : tup.cast (nat.zero_add n) (nil ⊔ xs) = xs :=
 have ∀ (i : fin n), fin.cast (eq.symm (nat.zero_add n)) i = fin.push_by 0 i, 
-from λ ⟨i, hi⟩, fin.eq_of_veq $ by simp,
-ext $ λ i, by simp [this]
+from λ ⟨_,_⟩, by simp [fin.push_by],
+ext $ λ ⟨i,hi⟩, by simp [ith_append_of_ge _ (nat.zero_le i)]
 
 lemma nil_append (xs : α ^ n) : nil ⊔ xs = tup.cast (eq.symm $ nat.zero_add n) xs :=
 eq_cast_symm_of_cast_eq $ nil_append' xs
+
+lemma cons_append' (x : α) (xs : α ^ m) (ys : α ^ n) :
+tup.cast (add_right_comm m 1 n) ((x :: xs) ⊔ ys) = (x :: (xs ⊔ ys)) := 
+ext $ λ i, 
+match i with
+| ⟨0,_⟩ := by simp [ith_append_of_lt (nat.zero_lt_succ m)]
+| ⟨i+1,hi⟩ := 
+  if him : i < m then
+    by simp 
+    [ ith_append_of_lt (nat.succ_lt_succ him)
+    , ith_append_of_lt him
+    ]
+  else
+    have hi' : i + 1 < m + 1 + n, by rw ← add_right_comm m n 1; exact hi,
+    have him : i ≥ m, from le_of_not_gt him,
+    by simp
+    [ ith_append_of_ge (nat.lt_of_succ_lt_succ hi) him
+    , ith_append_of_ge hi' (nat.succ_le_succ him)
+    ]
+end
+
+lemma cons_append (x : α) (xs : α ^ m) (ys : α ^ n) :
+(x :: xs) ⊔ ys = tup.cast (add_right_comm m n 1) (x :: (xs ⊔ ys)) := 
+eq_cast_symm_of_cast_eq $ cons_append' x xs ys
 
 lemma append_assoc (xs : α ^ l) (ys : α ^ m) (zs : α ^ n) :
 cast (nat.add_assoc l m n) ((xs ⊔ ys) ⊔ zs) = xs ⊔ (ys ⊔ zs) :=
 ext $ λ ⟨i, hi⟩,
 if hil : i < l then
-  have hc : fin.cast (eq.symm (nat.add_assoc l m n)) ⟨i,hi⟩ = fin.lift_by n (fin.lift_by m ⟨i,hil⟩), 
-  from fin.eq_of_veq $ by simp,
-  by simp [hc, ith_append_of_lt hil]
-else if him : i < l + m then
-  have hc : fin.cast (eq.symm (nat.add_assoc l m n)) ⟨i,hi⟩ = fin.lift_by n ⟨i,him⟩, 
-  from fin.eq_of_veq $ by simp,
-  have hilm : i - l < m, 
-  from nat.sub_lt_of_lt_add_of_ge (le_of_not_gt hil) him,
-  by simp [hc, ith_append_of_ge _ (le_of_not_gt hil), ith_append_of_lt hilm]
-else
-  have hc : fin.cast (eq.symm (nat.add_assoc l m n)) ⟨i,hi⟩ = ⟨i, eq.substr (nat.add_assoc l m n) hi⟩,
-  from fin.eq_of_veq $ by simp,
-  have hilm : i - l ≥ m, 
-  from nat.le_sub_of_add_le_of_ge (le_of_not_gt hil) (le_of_not_gt him), 
-  by simp [hc, ith_append_of_ge _ (le_of_not_gt hil), ith_append_of_ge _ (le_of_not_gt him), ith_append_of_ge _ hilm, nat.sub_sub]
+  have hilm : i < l + m, from nat.lt_add_right i l m hil,
+  by simp
+  [ ith_append_of_lt hil
+  , ith_append_of_lt hilm
+  ]
+else if hilm : i < l + m then
+  have hil : i ≥ l, from le_of_not_gt hil,
+  have i - l < m, from nat.sub_lt_of_lt_add_of_ge hil hilm,
+  by simp
+  [ ith_append_of_lt hilm
+  , ith_append_of_ge _ hil
+  , ith_append_of_lt this
+  ]
+else 
+  have hil : i ≥ l, from le_of_not_gt hil,
+  have hilm : i ≥ l + m, from le_of_not_gt hilm,
+  have i - l ≥ m, from nat.le_sub_of_add_le_of_ge hil hilm,
+  by simp
+  [ ith_append_of_ge _ hil
+  , ith_append_of_ge _ this
+  , ith_append_of_ge _ hilm
+  , nat.sub_sub
+  ]
 
 @[reducible] 
 definition take {{m n : ℕ}} : n ≤ m → α ^ m → α ^ n
@@ -154,27 +227,22 @@ lemma append_length : ∀ (nxs nys : ntup α), (nxs ++ nys).length = nxs.length 
 
 @[simp]
 lemma append_to_tup : ∀ (nxs nys : ntup α), 
-tup.cast (append_length nxs nys) (nxs ++ nys).to_tup = nxs.to_tup ⊔ nys.to_tup
-| ⟨nx,xs⟩ ⟨ny,ys⟩ := rfl
+(nxs ++ nys).to_tup = tup.cast (eq.symm $ append_length nxs nys) (nxs.to_tup ⊔ nys.to_tup)
+| ⟨nx,xs⟩ ⟨ny,ys⟩ := by simp [sigma.snd] 
 
 @[simp]
 lemma append_nil :
 ∀ (nxs : ntup α), nxs ++ nil = nxs
-| ⟨nx,xs⟩ := 
-  have tup.cast rfl (xs ⊔ tup.nil) = xs,
-  by simp [tup.append_nil xs],
-  ntup.eq rfl this
+| ⟨nx,xs⟩ := by apply eq; simp; exact tup.append_nil xs
 
 @[simp]
 lemma nil_append :
 ∀ (nxs : ntup α), nil ++ nxs = nxs
-| ⟨nx,xs⟩ :=
-  ntup.eq (zero_add nx) (tup.nil_append' xs)
+| ⟨nx,xs⟩ := by apply eq; simp; exact tup.nil_append' xs
 
 @[simp]
 lemma append_assoc : 
 ∀ (nxs nys nzs : ntup α), (nxs ++ nys) ++ nzs = nxs ++ (nys ++ nzs)
-| ⟨nx,xs⟩ ⟨ny,ys⟩ ⟨nz,zs⟩ :=
-  ntup.eq (add_assoc nx ny nz) (tup.append_assoc xs ys zs)
+| ⟨nx,xs⟩ ⟨ny,ys⟩ ⟨nz,zs⟩ := by apply eq; simp; exact tup.append_assoc xs ys zs
 
 end ntup
