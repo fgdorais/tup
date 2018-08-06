@@ -129,14 +129,14 @@ lemma cases_zero_succ_on {n : ℕ} {C : fin (n+1) → Sort*} (i : fin (n+1)) :
 C 0 → (Π i, C (fin.succ i)) → C i :=
 λ hz hs, fin.cases_zero_succ hz hs i
 
-lemma rec' {C : Π n, fin n → Sort*} :
+lemma rec_zero_succ {C : Π n, fin n → Sort*} :
 (Π n, C (n+1) 0) → (Π n i, C n i → C (n+1) (fin.succ i)) → (Π n i, C n i) :=
 λ hz hs n, nat.rec_on n (λ i, fin.elim0 i) $
 λ n ih, cases_zero_succ (hz n) (λ i, hs n i (ih i))
 
-lemma rec_on' {C : Π {n : ℕ}, fin n → Sort*} {n : ℕ} (i : fin n) :
+lemma rec_zero_succ_on {C : Π {n : ℕ}, fin n → Sort*} {n : ℕ} (i : fin n) :
 (Π (n : ℕ), C (fin.zero n)) → (Π (n : ℕ) (i : fin n), C i → C (fin.succ i)) → C i :=
-λ hz hs, rec' hz hs n i
+λ hz hs, rec_zero_succ hz hs n i
 
 end fin
 
