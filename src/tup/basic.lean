@@ -25,7 +25,7 @@ lemma ext {n : ℕ} {xs ys : α ^ n} :
 
 @[irreducible] definition nil : α ^ 0 := fin.elim0
 
-lemma eq_nil (xs : α ^ 0) : xs = nil := ext $ λ i, fin.elim0 i
+@[simp] lemma eq_nil (xs : α ^ 0) : xs = nil := ext $ λ i, fin.elim0 i
 
 @[reducible] definition const {n : ℕ} (x : α) : α ^ n := λ _, x
 
