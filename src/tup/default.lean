@@ -11,6 +11,7 @@ import .choice
 import .conj
 import .cons
 import .decidable
+import .edit
 import .map
 import .minmax
 import .quotient
