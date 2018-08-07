@@ -54,6 +54,7 @@ tup_lift f c (map quotient.mk zs) = f zs
   let qs := map quotient.mk zs in calc
   tup_lift f c qs 
       = tup_lift (quotient.lift f' c' (head qs)) _ (tail qs) : rfl
+  ... = tup_lift (quotient.lift f' c' (head qs)) _ (map quotient.mk (tail zs)) : by rw map_tail
   ... = quotient.lift f' c' (head qs) (tail zs) : tup_lift_beta _ _ _
   ... = quotient.lift f' c' (quotient.mk (head zs)) (tail zs) : by rw map_head
   ... = f' (head zs) (tail zs) : rfl

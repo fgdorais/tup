@@ -29,7 +29,9 @@ lemma tup.le_max : ∀ {n : ℕ} {xs : α ^ (n+1)} {i : fin (n+1)}, xs[i] ≤ xs
 
 lemma tup.max_le : ∀ {n : ℕ} {xs : α ^ (n+1)} {y : α}, (∀ i, xs[i] ≤ y) → xs.max ≤ y
 | 0 xs y h := h 0
-| (n+1) xs y h := max_le (h 0) (tup.max_le (λ i, h (fin.succ i)))
+| (n+1) xs y h :=
+  have ∀ i, xs.tail[i] ≤ y, from λ ⟨i,hi⟩, h ⟨i+1, nat.succ_lt_succ hi⟩,
+  max_le (h 0) (tup.max_le this)
 
 definition tup.max' : Π {n : ℕ}, n ≠ 0 → α ^ n → α
 | 0 h _ := absurd rfl h
@@ -63,7 +65,9 @@ lemma tup.min_le : ∀ {n : ℕ} {xs : α ^ (n+1)} {i : fin (n+1)}, xs[i] ≥ xs
 
 lemma tup.le_min : ∀ {n : ℕ} {xs : α ^ (n+1)} {y : α}, (∀ i, y ≤ xs[i]) → y ≤ xs.min
 | 0 xs y h := h 0
-| (n+1) xs y h := le_min (h 0) (tup.le_min (λ i, h (fin.succ i)))
+| (n+1) xs y h := 
+  have ∀ i, y ≤ xs.tail[i], from λ ⟨i,hi⟩, h ⟨i+1, nat.succ_lt_succ hi⟩,
+  le_min (h 0) (tup.le_min this)
 
 definition tup.min' : Π {n : ℕ}, n ≠ 0 → α ^ n → α
 | 0 h _ := absurd rfl h
