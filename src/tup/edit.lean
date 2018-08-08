@@ -27,7 +27,7 @@ del (fin.succ k) (x :: xs) = x :: (del k xs) := by simp
 
 lemma ith_del_of_vlt : 
 ∀ {n : ℕ} {k : fin (n+1)} {i : fin n}, 
-i.val < k.val → ∀ (xs : α ^ (n+1)), (del k xs)[i] = xs[fin.skip i]
+i.val < k.val → ∀ (xs : α ^ (n+1)), (del k xs)[i] = xs[fin.lift i]
 | 0 _ _ := by intros; apply fin.elim0; assumption
 | (n+1) ⟨0,_⟩ _ := by intros; exfalso; apply nat.not_lt_zero; assumption
 | (n+1) ⟨k+1,hk⟩ ⟨0,_⟩ := by intros; unfold del; reflexivity
@@ -75,16 +75,16 @@ ins (fin.succ k) x₀ (x :: xs) = x :: ins k x₀ xs := by simp
 
 lemma ith_ins_of_vlt : 
 ∀ {n : ℕ} {k : fin (n+1)} {i : fin n},
-i.val < k.val → ∀ (x : α) (xs : α ^ n), (ins k x xs)[fin.skip i] = xs[i]
+i.val < k.val → ∀ (x : α) (xs : α ^ n), (ins k x xs)[fin.lift i] = xs[i]
 | n ⟨0,_⟩ ⟨i,_⟩ := λ h, absurd h (nat.not_lt_zero i)
 | 0 ⟨k+1,hk⟩ _ := absurd (nat.lt_of_succ_lt_succ hk) (nat.not_lt_zero k)
 | (n+1) ⟨k+1,hk⟩ ⟨0,_⟩ := by intros; unfold ins; reflexivity
 | (n+1) ⟨k+1,hk⟩ ⟨i+1,hi⟩ :=
-  have fin.skip ⟨i, nat.lt_of_succ_lt_succ hi⟩ = ⟨i, nat.lt_of_succ_lt hi⟩, from rfl,
+  have fin.lift ⟨i, nat.lt_of_succ_lt_succ hi⟩ = ⟨i, nat.lt_of_succ_lt hi⟩, from rfl,
   begin
   intros h x xs,
   unfold ins,
-  simp [fin.skip],
+  simp [fin.lift],
   rw [← this],
   apply ith_ins_of_vlt,
   exact nat.lt_of_succ_lt_succ h,
@@ -127,7 +127,7 @@ have h' : i.val < k.val, from lt_of_le_of_ne h' h,
 have i.val < n, from lt_of_lt_of_le h' (nat.le_of_lt_succ k.is_lt),
 let i' := fin.mk i.val this in
 have hlt : i'.val < k.val, from h',
-have i = fin.skip i', from fin.eq_of_veq rfl,
+have i = fin.lift i', from fin.eq_of_veq rfl,
 begin
 rw [this, ith_ins_of_vlt hlt, ith_del_of_vlt hlt]
 end
