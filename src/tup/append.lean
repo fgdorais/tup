@@ -82,7 +82,7 @@ else
   ]
 
 lemma nil_append' (xs : α ^ n) : tup.cast (nat.zero_add n) (nil ⊔ xs) = xs :=
-have ∀ (i : fin n), fin.cast (eq.symm (nat.zero_add n)) i = fin.push_by 0 i, 
+have ∀ (i : fin n), fin.cast (ge_of_eq (nat.zero_add n)) i = fin.push_by 0 i, 
 from λ ⟨_,_⟩, by simp [fin.push_by],
 ext $ λ ⟨i,hi⟩, by simp [ith_append_of_ge _ (nat.zero_le i)]
 
@@ -143,11 +143,11 @@ else
 
 @[reducible] 
 definition take {{m n : ℕ}} : n ≤ m → α ^ m → α ^ n
-| h xs i := xs[fin.lift h i]
+| h xs i := xs[fin.cast h i]
 
 @[simp]
 lemma take_val {m n : ℕ} (h : m ≤ n) {xs : α ^ n} :
-∀ (i : fin m), (take h xs)[i] = xs[fin.lift h i] := 
+∀ (i : fin m), (take h xs)[i] = xs[fin.cast h i] := 
 λ _, rfl
 
 @[simp]
@@ -188,12 +188,16 @@ from calc
 ((m + n) - n) + i 
     = m + i : by rw nat.add_sub_cancel
 ... ≥ m : nat.le_add_right m i,
-have heq : (i + ((m + n) - n)) - m = i,
+have heq : (((m + n) - n) + i) - m = i,
 from calc
-(i + ((m + n) - n)) - m 
-    = (i + m) - m : by rw nat.add_sub_cancel
-... = i : by rw nat.add_sub_cancel,
-by simp [heq, ith_append_of_ge hlt hge]
+(((m + n) - n) + i) - m 
+    = (m + i) - m : by rw nat.add_sub_cancel
+... = i : by rw nat.add_sub_cancel_left,
+begin
+rw [drop_val, fin.push_mk, ith_append_of_ge hlt hge],
+apply ith_eq_of_veq, 
+exact heq
+end
 
 @[simp]
 lemma append_take_drop {m n : ℕ} {xs : α ^ (m + n)} :
