@@ -63,7 +63,7 @@ by cases n; reflexivity
 
 @[simp] lemma ins_succ {n : ℕ} (x : α) (xs : α ^ (n+1)) :
 ∀ k, ins (fin.succ k) x xs = xs.head :: ins k x xs.tail :=
-by cases n; intros k; cases k with k hk; simp [ins, fin.succ]
+by cases n; intros k; cases k; simp [ins, fin.succ]
 
 @[simp] lemma ins_succ_cons {n : ℕ} (x₀ x : α) (xs : α ^ n) (k : fin (n+1)) :
 ins (fin.succ k) x₀ (x :: xs) = x :: ins k x₀ xs := by simp
@@ -146,11 +146,11 @@ definition set : Π {n : ℕ}, fin n → α → α ^ n → α ^ n
 | (n+1) ⟨0,_⟩ x xs := x :: xs.tail
 | (n+1) ⟨k+1,hk⟩ x xs := xs.head :: set ⟨k, nat.lt_of_succ_lt_succ hk⟩ x xs.tail
 
-lemma set_zero {n : ℕ} (x : α) (xs : α ^ (n+1)) : set 0 x xs = x :: xs.tail := rfl
+@[simp] lemma set_zero {n : ℕ} (x : α) (xs : α ^ (n+1)) : set 0 x xs = x :: xs.tail := rfl
 
-lemma set_succ {n : ℕ} (x : α) (xs : α ^ (n+1)) : ∀ i, set (fin.succ i) x xs = xs.head :: set i x xs.tail := λ ⟨_,_⟩, rfl
+@[simp] lemma set_succ {n : ℕ} (x : α) (xs : α ^ (n+1)) : ∀ i, set (fin.succ i) x xs = xs.head :: set i x xs.tail := λ ⟨_,_⟩, rfl
 
-lemma ith_set : ∀ {n : ℕ} (k : fin n) (x : α) (xs : α ^ n), (set k x xs)[k] = x
+@[simp] lemma ith_set : ∀ {n : ℕ} (k : fin n) (x : α) (xs : α ^ n), (set k x xs)[k] = x
 | 0 k _ _ := fin.elim0 k
 | (n+1) ⟨0,_⟩ x xs := by simp [set]
 | (n+1) ⟨k+1,hk⟩ x xs := by simp [set]; apply ith_set
