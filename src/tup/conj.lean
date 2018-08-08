@@ -36,14 +36,17 @@ lemma conj_val_of_ge {x : α} {xs : α ^ n} :
 conj_val_of_ge (le_refl n)
 
 @[simp] lemma conj_lift {x : α} {xs : α ^ n} : 
-∀ {i : fin n}, (conj xs x)[fin.lift_by 1 i] = xs[i] := 
+∀ {i : fin n}, (conj xs x)[fin.lift i] = xs[i] := 
 λ ⟨i, ih⟩, conj_val_of_lt ih
 
 @[reducible] definition last : α ^ (n+1) → α := 
 λ xs, xs[⟨n, nat.lt_succ_self n⟩]
 
 @[reducible] definition left : α ^ (n+1) → α ^ n := 
-λ xs i, xs[fin.lift_by 1 i]
+λ xs i, xs[fin.lift i]
+
+@[simp] lemma ith_left {xs : α ^ (n+1)} {i : ℕ} {hi : i < n} :
+xs.left[⟨i,hi⟩] = xs[⟨i,nat.lt_succ_of_lt hi⟩] := rfl
 
 definition last_of_nonzero (h : n ≠ 0) : α ^ n → α :=
 match n, h with 
@@ -70,7 +73,7 @@ if h : i = n then
   by simp [h, ith_conj_last]
 else
   have h : i < n, from nat.lt_of_le_and_ne (nat.le_of_lt_succ hi) h,
-  by simp [ith_conj_of_lt h]
+  by simp [ith_conj_of_lt h]; reflexivity
 
 end tup
 
