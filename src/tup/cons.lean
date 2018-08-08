@@ -36,11 +36,11 @@ match n, h with
 | (n+1), _ := head
 end
 
-@[reducible] definition tail {n : ℕ} : α ^ (n+1) → α ^ n :=
-λ xs ⟨i,hi⟩, xs[⟨i+1, nat.succ_lt_succ hi⟩]
+@[reducible] definition tail {n : ℕ} : α ^ (n+1) → α ^ n := 
+λ xs i, xs[fin.succ i]
 
 @[simp] lemma ith_tail {n : ℕ} (xs : α ^ (n+1)) :
-∀ i, xs.tail[i] = xs[fin.succ i] := λ ⟨_,_⟩, rfl
+∀ i, xs.tail[i] = xs[fin.succ i] := λ i, rfl
 
 @[simp] lemma tail_cons {n : ℕ} {x : α} {xs : α ^ n} : 
 tail (cons x xs) = xs := ext $ λ ⟨_,_⟩, rfl
