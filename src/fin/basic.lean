@@ -35,6 +35,12 @@ lemma lift_ne_last {n : ℕ} : ∀ i, fin.lift i ≠ fin.last n := λ ⟨i, hi�
 
 lemma pred_succ {n : ℕ} : ∀ (i : fin n), fin.pred (fin.succ i) (fin.succ_ne_zero i) = i := λ ⟨_,_⟩, eq_of_veq $ rfl
 lemma drop_lift {n : ℕ} : ∀ (i : fin n), fin.drop (fin.lift i) (fin.lift_ne_last i) = i := λ ⟨_,_⟩, eq_of_veq $ rfl
+
+lemma lift_drop {n : ℕ} : ∀ (i : fin (n+1)) (h : i ≠ fin.last n), fin.lift (fin.drop i h) = i := λ ⟨_,_⟩ _, eq_of_veq $ rfl
+lemma succ_pred {n : ℕ} : ∀ (i : fin (n+1)) (h : i ≠ fin.zero n), fin.succ (fin.pred i h) = i 
+:= λ ⟨i,_⟩ h, have i ≠ 0, from fin.vne_of_ne h,
+eq_of_veq $ nat.succ_pred_eq_of_pos (nat.pos_of_ne_zero this)
+
 lemma succ_lift_eq_lift_succ {n : ℕ} : ∀ (i : fin n), fin.lift (fin.succ i) = fin.succ (fin.lift i) := λ ⟨_,_⟩, eq_of_veq $ rfl
 
 definition lift_by {m : ℕ} (n : ℕ) : fin m → fin (m+n) := λ ⟨i,hi⟩, ⟨i, nat.lt_add_right i m n hi⟩
