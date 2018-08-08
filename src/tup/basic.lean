@@ -23,6 +23,10 @@ notation xs `[`:max_plus i `]`:0 := ith xs i
 lemma ext {n : ℕ} {xs ys : α ^ n} : 
 (∀ i, xs[i] = ys[i]) → xs = ys := funext
 
+lemma ith_eq_of_veq {n : ℕ} {{i j : fin n}} : 
+i.val = j.val → ∀ (xs : α ^ n), xs[i] = xs[j] :=
+λ hv xs, eq.rec_on (show i = j, from fin.eq_of_veq hv) rfl
+
 @[irreducible] definition nil : α ^ 0 := fin.elim0
 
 @[simp] lemma eq_nil (xs : α ^ 0) : xs = nil := ext $ λ i, fin.elim0 i
