@@ -9,10 +9,10 @@ namespace tup
 variables {α : Type*} {m n : ℕ}
 
 @[reducible] definition cast (h : m = n) : α ^ m → α ^ n :=
-λ xs i, xs[fin.cast (eq.symm h) i]
+λ xs i, xs[fin.cast (ge_of_eq h) i]
 
 @[simp] lemma val_cast (h : m = n) (xs : α ^ m) :
-∀ i, (tup.cast h xs)[i] = xs[fin.cast (eq.symm h) i] := λ i, rfl
+∀ i, (tup.cast h xs)[i] = xs[fin.cast (ge_of_eq h) i] := λ i, rfl
 
 @[simp] lemma val_mk_cast (h : m = n) (xs : α ^ m) (i : ℕ) (hi : i < n) : 
 (tup.cast h xs)[⟨i,hi⟩] = xs[⟨i, eq.substr h hi⟩] := rfl
@@ -45,7 +45,7 @@ lemma cast_inj :
 | n .(n) xs rfl rfl := by simp
 
 lemma cast_ext : ∀ {m n : ℕ} {xs : α ^ m} {ys : α ^ n} {h : n = m},
-(∀ i, xs[fin.cast h i] = ys[i]) → xs = cast h ys 
+(∀ i, xs[fin.cast (le_of_eq h) i] = ys[i]) → xs = cast h ys 
 | _ ._ xs ys rfl := by simp; exact ext
 
 @[simp] lemma eq_rec_eq_cast : 
