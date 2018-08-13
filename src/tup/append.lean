@@ -35,7 +35,7 @@ lemma append_push_by {xs : α ^ m} {ys : α ^ n} :
   calc
   (xs ⊔ ys)[⟨m+i, nat.add_lt_add_left h m⟩] 
       = ys[⟨(m+i)-m, _⟩] : ith_append_of_ge (nat.add_lt_add_left h m) (nat.le_add_right m i)
-  ... = ys[⟨i, h⟩]       : by simp [nat.add_sub_cancel']
+  ... = ys[⟨i, h⟩]       : by simp [nat.add_sub_cancel_left]
 
 definition fun_append (f : α → Sort*) {xs : α ^ m} {ys : α ^ n} :
 (Π i, f xs[i]) → (Π i, f ys[i]) → (Π i, f (xs ⊔ ys)[i]) :=
