@@ -37,7 +37,7 @@ definition tup.max' : Π {n : ℕ}, n ≠ 0 → α ^ n → α
 | 0 h _ := absurd rfl h
 | (n+1) _ xs := xs.max
 
-lemma tup.le_max' : ∀ {n : ℕ} {xs : α ^ n} {i : fin n}, xs[i] ≤ tup.max' (fin.nonzero_of_fin i) xs
+lemma tup.le_max' : ∀ {n : ℕ} {xs : α ^ n} {i : fin n}, xs[i] ≤ tup.max' (fin.ne_zero_of_fin i) xs
 | 0 _ i := fin.elim0 i
 | (n+1) _ _ := tup.le_max
 
@@ -73,7 +73,7 @@ definition tup.min' : Π {n : ℕ}, n ≠ 0 → α ^ n → α
 | 0 h _ := absurd rfl h
 | (n+1) _ xs := xs.min
 
-lemma tup.min'_le : ∀ {n : ℕ} {xs : α ^ n} {i : fin n}, xs[i] ≥ tup.min' (fin.nonzero_of_fin i) xs
+lemma tup.min'_le : ∀ {n : ℕ} {xs : α ^ n} {i : fin n}, xs[i] ≥ tup.min' (fin.ne_zero_of_fin i) xs
 | 0 _ i := fin.elim0 i
 | (n+1) _ _ := tup.min_le
 
